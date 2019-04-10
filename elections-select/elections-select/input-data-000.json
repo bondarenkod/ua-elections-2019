@@ -1,0 +1,15 @@
+{
+  "RegionName": "Полтавська область",
+  "CityName": "",
+  "ElectionDistrict": {
+    "DistrictName": "1000",
+    "ElectionSectionsSpecial": [
+      {
+        "Id": "000000",
+        "Location": "Луганська обл., Попаснянський р-н, у р-ні с. Троїцьке"
+      }
+    ],
+    "ElectionSections": [
+    ]
+  }
+}
