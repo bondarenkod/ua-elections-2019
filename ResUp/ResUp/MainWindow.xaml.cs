@@ -52,10 +52,26 @@ namespace ResUp
                     return;
                 }
 
-                var cc = Browser.GetCookieManager();
-                var t = new TaskCookieVisitor();
-                cc.VisitAllCookies(t);
-                var res = await t.Task;
+                var cookieManager = Browser.GetCookieManager();
+                var csrf_token = await Browser.EvaluateScriptAsync("window.csrf_token", TimeSpan.FromMilliseconds(2000));
+                var cos2 = await cookieManager.VisitAllCookiesAsync();
+
+                var all = cos2.Where(x => !string.IsNullOrEmpty(x.Domain) && x.Domain.Contains("e-vybory.org")).ToList();
+
+                var dic = new Dictionary<string, string>();
+                foreach (var cookie in all)
+                {
+                    dic[cookie.Name] = cookie.Value;
+                }
+
+                var us = new UploadService();
+                await us.Test(
+                    "68"
+                    , "681325"
+                    , "192"
+                    , $"Hello, {DateTime.Now.ToShortTimeString()}"
+                    , dic
+                    , csrf_token.Result.ToString());
             }
         }
     }
