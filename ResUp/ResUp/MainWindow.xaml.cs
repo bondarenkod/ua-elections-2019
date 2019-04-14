@@ -141,7 +141,7 @@ namespace ResUp
             }
             catch (Exception exception)
             {
-               OnUserError(exception.ToString());
+                OnUserError(exception.ToString());
             }
         }
 
@@ -255,9 +255,10 @@ namespace ResUp
                             document.RegionId
                             , document.PollingStation
                             , document.DistrictNumber
-                            , $"upl04d 4u70m470r, {DateTime.Now.ToString("O")}"
+                            , $"created by upl04d 4u70m470r"
                             , d.Cookies
-                            , d.CsrfToken);
+                            , d.CsrfToken
+                            , false);
 
                         if (res.ІsSuccessful)
                         {

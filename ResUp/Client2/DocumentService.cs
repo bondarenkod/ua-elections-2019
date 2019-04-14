@@ -10,7 +10,7 @@ namespace Client2
     public class DocumentService
     {
         private const string SiteUrl = "https://e-vybory.org/";
-        public async Task<(bool ІsSuccessful, string DocumentId)> CreateRemoteDocument(string region_id, string polling_station, string district_number, string comments, Dictionary<string, string> cookies, string csrf_token, string clarified = "1")
+        public async Task<(bool ІsSuccessful, string DocumentId)> CreateRemoteDocument(string region_id, string polling_station, string district_number, string comments, Dictionary<string, string> cookies, string csrf_token, bool clarified)
         {
             var client = new RestClient(SiteUrl);
 
@@ -27,7 +27,11 @@ namespace Client2
             request.AddParameter("region_id", region_id);
             request.AddParameter("polling_station", polling_station);
             request.AddParameter("district_number", district_number);
-            request.AddParameter("clarified", clarified);
+            if (clarified)
+            {
+                request.AddParameter("clarified", "1");
+            }
+
             request.AddParameter("comments", comments);
 
             var res = await client.ExecutePostTaskAsync(request);
