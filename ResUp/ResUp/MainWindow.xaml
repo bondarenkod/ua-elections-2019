@@ -16,6 +16,12 @@
             <TabItem
                 Header="Browser">
                 <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition
+                            Width="32*" />
+                        <ColumnDefinition
+                            Width="361*" />
+                    </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition
                             Height="Auto" />
@@ -26,61 +32,78 @@
                     <StackPanel
                         Grid.Row="0"
                         Orientation="Horizontal"
-                        Margin="4">
-                        <Button
+                        Margin="4"
+                        Grid.ColumnSpan="2">
+                        <!--<Button
                             Content="kkk"
                             Click="webbrowsertopbuttonclick"
                             Tag="http://www.html-kit.com/tools/cookietester/"
-                            Margin="0,0,10,0" />
+                            Margin="0,0,10,0" />-->
 
                         <Button
                             Content="home"
                             Click="webbrowsertopbuttonclick"
+                            x:Name="HomeButton"
                             Tag="https://e-vybory.org/"
                             Margin="0,0,10,0" />
                         <Button
                             Content="my-docs"
                             Margin="0,0,10,0"
+                            x:Name="MyDocsButton"
                             Click="webbrowsertopbuttonclick"
                             Tag="https://e-vybory.org/my-docs" />
-                        <Button
+                        <!--<Button
                             Content="test"
-                            Click="webbrowsertopbuttonclick" />
+                            Click="webbrowsertopbuttonclick" />-->
                     </StackPanel>
 
                     <wpf:ChromiumWebBrowser
                         Grid.Row="1"
                         x:Name="Browser"
-                        Address="https://e-vybory.org">
-
-                        <!--<i:Interaction.Behaviors>
-
-                        <behaviours:HoverLinkBehaviour
-                            x:Name="HoverLinkBehaviour" />
-
-                    </i:Interaction.Behaviors>-->
-
+                        Address="https://e-vybory.org"
+                        Grid.ColumnSpan="2">
                     </wpf:ChromiumWebBrowser>
                 </Grid>
-                <!--<WebBrowser
-                    x:Name="webView"
-                    Source="https://e-vybory.org" />-->
             </TabItem>
             <TabItem
                 Header="Logic">
                 <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition
+                            Height="Auto" />
+                        <RowDefinition
+                            Height="Auto" />
+                        <RowDefinition
+                            Height="*" />
+                    </Grid.RowDefinitions>
                     <StackPanel
                         Margin="10"
                         Orientation="Horizontal"
                         VerticalAlignment="Top">
                         <Button
                             Padding="10"
-                            Content="Select" />
+                            Click="SelectWorkingFolder"
+                            Content="Select folder with documents" />
                         <Button
                             Padding="10"
+                            Click="BeginUploadClick"
                             Margin="10, 0, 0, 0"
                             Content="Start" />
                     </StackPanel>
+                    <Label
+                        Margin="10, 0, 0, 0"
+                        Grid.Row="1"
+                        x:Name="SelectedWorkingPath"
+                        Content=""
+                        FontSize="14" />
+                    <TextBox
+                        x:Name="Output"
+                        FontSize="12"
+                        Margin="10"
+                        TextWrapping="Wrap"
+                        IsReadOnly="True"
+                        IsReadOnlyCaretVisible="True"
+                        Grid.Row="2"></TextBox>
                 </Grid>
             </TabItem>
         </TabControl>
