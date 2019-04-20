@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -26,6 +27,26 @@ namespace ResUp
             CefSharp.Cef.Initialize(settings);
             InitializeComponent();
             Browser.Initialized += BrowserOnInitialized;
+            SetupOther();
+        }
+
+        private async void SetupOther()
+        {
+            var res = await new DocumentService().InitPollingData();
+            if (res.Item1)
+            {
+                InitPanel.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                OnUserError($"Невдалось ініціалізувати дані: {res.Item2}");
+                return;
+            }
+
+
+            var pollingDistricts = await new DocumentService().GetListOfPollingDistricts();
+
+            SelectOvk.ItemsSource = pollingDistricts.Item1;
         }
 
         private void BrowserOnInitialized(object sender, EventArgs e)
@@ -167,29 +188,44 @@ namespace ResUp
 
             var sb = new StringBuilder();
 
-            sb.AppendLine($"Folder processed. {docs.Length} documents.");
+            sb.AppendLine($"Обрану теку опрацьовано - {path}");
 
             var hasDocs = docs.Where(x => x.Files?.Any() == true).ToList();
-            var docsWithErrors = docs.Where(x => x.HasError).ToList();
+            var docsWithErrors = hasDocs.Where(x => x.HasError).ToList();
             var allSent = hasDocs.Where(x => x.Sent).ToList();
             var toSend = hasDocs.Where(x => !x.Sent & !x.HasError).ToList();
 
-            _selectedDocs = toSend.ToArray();
+            var listOfInvalidDocuments = new List<(Document, string)>();
+            foreach (var document in toSend)
+            {
+                var cr = us.CheckIfDocumentValid(document);
+                if (!cr.Item1)
+                {
+                    listOfInvalidDocuments.Add((document, cr.Item2));
+                }
+            }
 
-            sb.AppendLine($"Total documents {docs.Length}");
-            sb.AppendLine($"With content {hasDocs.Count}");
-            sb.AppendLine($"Loaded with errors {docsWithErrors.Count}");
-            sb.AppendLine($"Already sent {allSent.Count}");
-            sb.AppendLine($"is going to be sent {toSend.Count}");
+
+            _selectedDocs = toSend.ToArray();
+            const int w = -30;
+            sb.AppendLine($"{"Всього документів знайдено",w} - {docs.Length}");
+            sb.AppendLine($"{"Документів з даними",w} - {hasDocs.Count}");
+            sb.AppendLine($"{"Документів з помилками",w} - {docsWithErrors.Count}");
+            sb.AppendLine($"{"Документів з некорректними ID",w} - {listOfInvalidDocuments.Count}");
+            sb.AppendLine($"{"Вже надіслані",w} - {allSent.Count}");
+            sb.AppendLine($"{"Буде надіслано",w} - {toSend.Count}");
             sb.AppendLine("========================================");
-            sb.AppendLine($"Loaded with errors:");
-            sb.AppendLine(string.Join(",", docsWithErrors.Select(x => x.Name)));
+            sb.AppendLine($"Перелік документів підготовлених до відправки [РЕГІОН:ТВО-ДІЛЬНИЦЯ]:");
+            sb.AppendLine(string.Join("", toSend.Select(x => $"{x.RegionId}:{x.Name}\n")));
             sb.AppendLine("========================================");
-            sb.AppendLine($"Already sent:");
-            sb.AppendLine(string.Join(",", allSent.Select(x => x.Name)));
+            sb.AppendLine($"Перелік надісланих документів:");
+            sb.AppendLine(string.Join(" ", allSent.Select(x => x.Name)));
             sb.AppendLine("========================================");
-            sb.AppendLine($"To send:");
-            sb.AppendLine(string.Join(",", toSend.Select(x => x.Name)));
+            sb.AppendLine($"Перелік документів з некорректним номером дільниці або ТВО або регіоном:");
+            sb.AppendLine(string.Join("", listOfInvalidDocuments.Select(x => $"{x.Item1.Name} - {x.Item2}\n")));
+            sb.AppendLine("========================================");
+            sb.AppendLine($"Перелік документів, які були завантажені з помилками:");
+            sb.AppendLine(string.Join(" ", docsWithErrors.Select(x => x.Name)));
             sb.AppendLine("========================================");
             Output.Text = sb.ToString();
         }
@@ -243,13 +279,13 @@ namespace ResUp
                 {
                     if (document.Sent)
                     {
-                        LogLocal($"{document.Name} - already sent, skipping");
+                        LogLocal($"{document.Name} - вже надіслано, пропускаємо");
                         continue;
                     }
 
                     try
                     {
-                        document.RegionId = "68";
+                        //document.RegionId = "68";
 
                         var res = await ds.CreateRemoteDocument(
                             document.RegionId
@@ -263,27 +299,27 @@ namespace ResUp
                         if (res.ІsSuccessful)
                         {
                             var uploadFilesRes = await ds.UploadToRemoteDocument(res.DocumentId, d.Cookies, d.CsrfToken, document.Files);
-                            if (uploadFilesRes)
+                            if (uploadFilesRes.Item1)
                             {
                                 document.MakeDone();
-                                LogLocal($"{document.Name} - done");
+                                LogLocal($"{document.Name} - завантаження ОК");
                             }
                             else
                             {
                                 document.MakeError();
-                                LogLocal($"{document.Name} - error");
+                                LogLocal($"{document.Name} - виникла помилка при завантаженні файлів документа - {uploadFilesRes.error}");
                             }
                         }
                         else
                         {
                             document.MakeError();
-                            LogLocal($"{document.Name} - error");
+                            LogLocal($"{document.Name} - виникла помилка при створенні документа");
                         }
                     }
                     catch (Exception e)
                     {
                         document.MakeError();
-                        LogLocal($"{document.Name} - system error");
+                        LogLocal($"{document.Name} - виникла критична помилка при завантаження документа");
                     }
                 }
 
@@ -310,5 +346,61 @@ namespace ResUp
         {
             MessageBox.Show(message, "Error", MessageBoxButton.OK);
         }
+
+        private async void CreareDocumentTemplates(object sender, RoutedEventArgs e)
+        {
+            if (SelectOvk.SelectedValue == null)
+            {
+                OnUserError("спершу оберіть ОВК");
+                return;
+            }
+
+            var pollingDistrict = SelectOvk.SelectedValue.ToString();
+
+            var res = await new DocumentService().GetListOfPollingStations(pollingDistrict);
+
+            if (res.Item1 == null)
+            {
+                OnUserError($"дивно, але ми нічого не знайшли для {pollingDistrict}, можливо виникла якась помилка. {res.errorMessage}");
+                return;
+            }
+
+
+            var resDir = "output";
+            try
+            {
+                if (Directory.Exists(resDir))
+                {
+                    Directory.Delete(resDir, true);
+                }
+            }
+            catch (Exception exception)
+            {
+                OnUserError($"неможливо видалити папку {resDir}. Можливо ви відкрили щось звідти. {exception.Message}");
+                return;
+            }
+
+            try
+            {
+                await Task.Delay(200);
+                Directory.CreateDirectory(resDir);
+                await Task.Delay(200);
+                foreach (var s in res.Item1)
+                {
+                    Directory.CreateDirectory(Path.Combine(resDir, $"{pollingDistrict}-{s}"));
+                }
+
+                OnUserError($"Здається, документи було сгенеровано успішно, тепер ви можете скопіювати все що вам треба до робочої теки. Не використовуйте теку цієї программи з результатами генерування документів як робочу.");
+
+                Process.Start(Path.Combine(Environment.CurrentDirectory, resDir));
+
+            }
+            catch (Exception exception)
+            {
+                OnUserError($"під час створення документів сталася помилка - {exception.Message}");
+            }
+        }
     }
+
+
 }

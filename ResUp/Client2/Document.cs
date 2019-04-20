@@ -26,7 +26,7 @@ namespace SiteClient
             }
         }
 
-        public void MakeError()
+        public void MakeError(string errorMessage = null)
         {
             HasError = true;
             var fp = System.IO.Path.Combine(Path, $"res{ExtError}");
