@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using RestSharp;
 
-namespace Client2
+namespace SiteClient
 {
     public class DocumentService
     {

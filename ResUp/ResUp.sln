@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResUp", "ResUp\ResUp.csproj", "{C0F664F0-0B89-4E4D-905E-43E6C33254A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client2", "Client2\Client2.csproj", "{BD653C63-BE92-4324-B1AD-80C9F725847B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiteClient", "Client2\SiteClient.csproj", "{BD653C63-BE92-4324-B1AD-80C9F725847B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using CefSharp;
 using CefSharp.Wpf;
-using Client2;
+using SiteClient;
 
 namespace ResUp
 {
