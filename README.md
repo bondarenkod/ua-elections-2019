@@ -15,7 +15,7 @@
 - Android https://play.google.com/store/apps/details?id=com.microsoft.office.officelens&hl=uk
 - ios https://itunes.apple.com/us/app/microsoft-office-lens-pdf-scan/id975925059?mt=8
 
-Відео роботи додатка, будь ласка, перейдіть за посиланням - TODO
+**Відео роботи додатка**, будь ласка, перейдіть за посиланням - https://youtu.be/fuBQ7rVKCWo
 
 ## Підготовка протоколів
 
