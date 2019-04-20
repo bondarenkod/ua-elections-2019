@@ -44,10 +44,10 @@
    
 
 1. Таби **browser**, **logic** та **Create-Documents**
+
 ![alt](https://bdfss.blob.core.windows.net/shots/2019-04-21_01-46-50-054a9880-7153-4a1d-83ff-7bb882002e2b-ResUp.png)   
 
 - **browser** - містить у собі вбудований браузер на базі проекту https://github.com/cefsharp/CefSharp, а також дві кнопки - home та my-docs 
-![alt](https://bdfss.blob.core.windows.net/shots/2019-04-20_19-21-07-f15c0376-baad-49f3-9983-3c795d97e754-ResUp.png)     
     - **home** - відкриває домашню сторінку сайту https://e-vybory.org/
     - **my-docs** - відкриває домашню сторінку сайту https://e-vybory.org/my-docs
   Сторінка **my-docs** відкривається тільки для залогінених користувачів. Для цього необіхідно авторизуватись.
