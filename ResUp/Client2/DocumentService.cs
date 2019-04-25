@@ -19,7 +19,14 @@ namespace SiteClient
 
             var request = new RestRequest("new-doc");
 
+            request.AddHeader("Host", "e-vybory.org");
             request.AddHeader("Cache-Control", "max-age=0");
+            request.AddHeader("Upgrade-Insecure-Requests", "1");
+            request.AddHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
+            request.AddHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+            request.AddHeader("Referer", "https://e-vybory.org/my-docs");
+            request.AddHeader("Accept-Encoding", "gzip, deflate, br");
+            request.AddHeader("Accept-Language", "en-US,en;q=0.9");
 
             foreach (var k in cookies)
             {
@@ -30,11 +37,7 @@ namespace SiteClient
             request.AddParameter("region_id", region_id);
             request.AddParameter("polling_station", polling_station);
             request.AddParameter("district_number", district_number);
-            if (clarified)
-            {
-                request.AddParameter("clarified", "1");
-            }
-
+            request.AddParameter("clarified", clarified ? "1" : "0");
             request.AddParameter("comments", comments);
 
             var res = await client.ExecutePostTaskAsync(request);
